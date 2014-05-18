@@ -1,0 +1,25 @@
+.axis path,
+.axis line {
+	shape-rendering: crispEdges;
+	stroke: darkgray;
+	fill: none
+}
+
+.axis text {
+	font: 10px tahoma;
+}
+
+div.button {
+	background-color: teal;
+	height: 50px;
+	line-height: 50px;
+	width: 50px;
+	border-radius: 5px;
+	text-align: center;
+	vertical-align: middle;
+	color: white
+}
+
+.button:hover {
+	background-color: #ce3919
+}

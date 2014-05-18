@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+
+	<head>
+
+		<title>
+			created 2014-04-21
+		</title>
+		
+		<link rel="stylesheet" href="randomDots.css" >
+	
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8">	
+		</script>
+		
+	</head>
+	
+	<body> 
+	
+		<div class = button>
+			<strong>
+				click!
+			</strong>
+		</div>
+	
+		<script>
+			//set number of dots in plot
+		var cntDots = 100;
+		
+		
+		//define functions
+		var popArr = function(arr) {
+			for(var i = 0; i < cntDots; i++) {
+				arr[i] = [Math.round(Math.random() * (svgW * .95)),
+						   Math.round(Math.random() * (svgH * .95))];
+			}
+		}
+		
+		var changeColors = function() {
+			var randomInt = Math.floor((Math.random() * 7) + 1);
+			var arrColors = ["darkgray","red", "orange", "yellow", "green", "blue",
+							 "indigo", "violet"];
+			return arrColors[randomInt];
+		}
+		
+		var svgH = 500;
+		var svgW = 750;
+		var pad = 30;
+		
+		var arr = []
+		
+		//populate array with initial batch of random numbers
+		popArr(arr);
+		
+		//create scales
+		var xScale =
+			d3.scale.linear()
+			.domain([0, d3.max(arr, function(d) {
+							   return d[0];
+							   })])
+			.range([pad, svgW - pad])
+			
+		var yScale =
+			d3.scale.linear()
+			.domain([0, d3.max(arr, function(d) {
+							   return d[1];
+							   })])
+		   .range([svgH - pad, pad]);
+	   
+		
+		
+		//create svg
+		var svg =
+			d3.select("body")
+			.append("svg")
+			.attr({
+				  height: svgH,
+				  width: svgW
+				  })
+				  
+		//create circles
+		svg.selectAll("circle")
+		.data(arr)
+		.enter()
+		.append("circle")
+		.attr({
+			  cx: function(d) {
+			  return xScale(d[0]);
+			  },
+			  cy: function(d) {
+			  return yScale(d[1]);
+			  },
+			  r: 3,
+			  fill: changeColors()
+			  });
+
+		//create and call axes
+		var xAxis = d3.svg.axis()
+			.orient("bottom")
+			.scale(xScale);
+		
+		var yAxis = d3.svg.axis()
+			.orient("left")
+			.scale(yScale);
+		
+		svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + (svgH - pad) + ")")
+			.call(xAxis)
+		
+		svg.append("g")
+			.attr("class", "y axis")
+			.attr("transform", "translate(" + pad + ",0)")
+			.call(yAxis)
+		
+		//after clicking on div button do this:
+		d3.select(".button")
+			.on("click", function() {
+				popArr(arr);
+				
+				//create updated scales
+				xScale.domain([0, d3.max(arr, function(d) {
+										 return d[0]
+										 })]);
+				
+				yScale.domain([0, d3.max(arr, function(d) {
+										 return d[1]
+										 })]);
+				//update dots
+				svg.selectAll("circle")
+				.data(arr)
+				.transition()
+				.delay(function(d, i) {
+					   return (i / arr.length) * 100;
+					   })
+				.duration(500)
+				.attr({
+					  cx: function(d) {
+					  return xScale(d[0]);
+					  },
+					  cy: function(d) {
+					  return yScale(d[1]);
+					  },
+					  fill: changeColors()
+				})
+				
+				//update axes
+				svg.select(".x.axis")
+					.transition()
+					.duration(600)
+					.call(xAxis)
+				
+				svg.select(".y.axis")
+				.transition()
+				.duration(600)
+				.call(yAxis)
+			})
+		</script>
+	
+	</body>
+	
+</html>

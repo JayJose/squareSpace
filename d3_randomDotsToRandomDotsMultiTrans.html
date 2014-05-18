@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+    <head>
+		<title>
+			created 2014-04-27
+		</title>
+        <style>
+            
+            .axis line,
+            .axis path {
+                fill: none;
+                stroke: black;
+                shape-rendering: crispEdges
+            }
+            
+            .axis text {
+                font-family: tahoma;
+                font-size: 10px
+            }
+            
+            .cirkle {
+                fill: darkgray
+            }
+            
+            .instruct {
+                font-family: Gillsans, serif;
+                font-size: 16px;
+                text-decoration: underline;
+                margin-left: 30px
+            }
+            
+        </style>
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8">	
+		</script>
+    </head>
+    
+    <body>
+        
+        <div class = "instruct">
+            click within the plot to update with new points
+        </div>
+        
+        <script>
+            var popRandom = function(array) {
+                for(var i = 0; i < dotCnt; i++) {
+                    array[i] = [Math.round(Math.random() * svgW * .90),
+                               Math.round(Math.random() * svgH * .90)]
+                }
+            }
+            
+            var arr = [];
+            var dotCnt = 40;
+            var svgH = 500;
+            var svgW = 500;
+            var pad = 30;
+            var cirRad = 4;
+            //dot fills
+            var initialFill = "slateblue";
+            var moFill = "darkorange";
+            var transitionFill = "limegreen";
+            
+            //populate array
+            popRandom(arr);
+            
+            //create scales
+            xScale =
+                d3.scale.linear()
+                    .domain([0, d3.max(arr, function(d) {
+                        return d[0];
+                    })])
+                    .range([pad, svgW - pad])
+            
+            yScale =
+                d3.scale.linear()
+                    .domain([0, d3.max(arr, function(d) {
+                        return d[1];
+                    })])
+                    .range([svgH - pad, pad])
+            
+            //create svg
+            var svg = 
+                d3.select("body")
+                .append("svg")
+                .attr({
+                    height: svgH,
+                    width: svgW
+                })
+            
+            svg.selectAll("circle")
+            .data(arr)
+            .enter()
+            .append("circle")
+            .attr({
+                cx: function(d) {
+                    return xScale(d[0]);
+                },
+                cy: function(d) {
+                    return yScale(d[1]);
+                },
+                fill: initialFill,
+                r: cirRad
+            })
+            .on("mouseover", function() {
+                d3.select(this)
+                .transition()
+                .duration(100)
+                .attr({
+                    fill: moFill,
+                    r: cirRad * 2
+                });
+            })
+            .on("mouseout", function() {
+                d3.select(this)
+                .transition()
+                .duration(250)
+                .attr({
+                    fill: initialFill,
+                    r: cirRad
+                });
+            })
+           
+
+            
+            //create axes
+            var xAxis =
+                d3.svg.axis()
+                .orient("bottom")
+                .scale(xScale)
+                .ticks(5)
+            
+            var yAxis =
+                d3.svg.axis()
+                .orient("left")
+                .scale(yScale)
+                .ticks(5)
+            
+            //call axes
+            svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + (svgH - pad) + ")")
+            .call(xAxis)
+                
+            svg.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate(" + pad + ",0)")
+            .call(yAxis)
+            
+            //on click
+            svg.on("click", function() {
+                
+                //repopulate with new values
+                popRandom(arr);
+                
+                //new scale domains (inputs!)
+                xScale.domain([0, d3.max(arr, function(d) {
+                    return d[0];
+                })])
+                
+                yScale.domain([0, d3.max(arr, function(d) {
+                    return d[1];
+                })])
+                
+                //new circle positions and transition
+                svg.selectAll("circle")
+                .data(arr)
+                .transition()
+//                .delay(function(d, i) {
+//                    return i * 5;
+//                })
+                .duration(300)
+                .each("start", function() {
+                    d3.select(this)
+                    .attr("fill", transitionFill)
+                    .attr("r", cirRad * 1.5)
+                })
+                .attr({
+                cx: function(d) {
+                    return xScale(d[0]);
+                },
+                cy: function(d) {
+                    return yScale(d[1]);
+                }
+                })
+//                .each("end", function() {
+//                    d3.select(this)
+//                    .transition()
+//                    .duration(250)
+//                    .attr("fill", "black")
+//                    .attr("r", cirRad)
+//                })
+                .transition()
+                .duration(250)
+                .attr({
+                    fill: initialFill,
+                    r: cirRad
+                })
+        
+                //new transitional axes
+                svg.select(".x.axis")
+                    .transition()
+                    .duration(250)
+                    .call(xAxis)
+                
+                svg.select(".y.axis")
+                    .transition()
+                    .duration(250)
+                    .call(yAxis)
+            })
+            
+        </script>
+    
+    </body>
+</html>

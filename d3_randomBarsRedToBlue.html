@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+
+	<head>
+
+		<title>
+			created 2014-04-20
+		</title>
+	
+		<style>
+		
+			div.button {
+			            background-color: darkorange;
+			            height: 50px;
+			            width: 50px;
+			            border-radius: 25px;
+			            margin: left
+			            }
+    
+		    p.info {
+		        font-family: georgia;
+		        font-size: 12px
+		    }
+            
+            div:hover {
+                background-color: pink;
+            }
+
+		</style>
+		
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8">	
+        
+            function popArray(array) {
+                for(var i = 0; i < 20; i++) {
+		        array[i] = Math.round(Math.random() * (svgH*.90));
+                }
+                
+                array.sort(function(a,b) {
+		             return a - b;
+		             })
+            }
+            
+            function rgb(position) {
+		      if(red) {
+		        return "rgb(" + (position * 25) + ",0,0)";
+		      }
+		      else {
+		        return "rgb(0,0," + (position * 25) + ")";
+		      }
+		    }
+            
+		</script>
+		
+	</head>
+	
+	<body>
+	
+		<div class = "button"></div>
+		<p class = "info">
+		    <i>click the purple circle to update the graph with new values</i>
+		    <br>
+		</p>
+	
+		    <script type = text/javascript>
+			
+		    var svgW = 600;
+		    var svgH = 400;
+		    
+		    var arr = [];
+		    var cntBars = 35;
+		    
+		    popArray(arr);
+		             
+		    scaleX = d3.scale.ordinal()
+		        .domain(d3.range(arr.length))
+		        .rangeRoundBands([0, svgW], 0.05);
+		    
+		    scaleY = d3.scale.linear()
+		        .domain([0, d3.max(arr)])
+		        .range([0, svgH]);
+		    
+		
+		    //append svg to body
+		    var svg = d3.select("body")
+		    .append("svg")
+		    .attr({
+		          height: svgH,
+		          width: svgW
+		    })
+		    
+		    var red = true;
+		    
+		    //create rects
+		    svg.selectAll("rect")
+		    .data(arr)
+		    .enter()
+		    .append("rect")
+		    .attr({
+		          x: function(d, i) {
+		          return scaleX(i);
+		          },
+		          y: function(d) {
+		          return svgH - scaleY(d);
+		          },
+		          width: scaleX.rangeBand(),
+		          height: function(d) {
+		          return scaleY(d);
+		          },
+		          fill: function(d, i) {
+		          return r2b(i);
+		          }
+		          });
+		
+		    d3.select(".button")
+		    .on("click", function() {
+		        popArray(arr);
+				red = !red;
+		        
+		        svg.selectAll("rect")
+		        .data(arr)
+		        .transition()
+		        .delay(function(d, i) {
+		          	  return i * 69;
+		        })
+		        .duration(750)
+		        .attr("y", function(d) {
+		              return svgH - scaleY(d);
+		              })
+		        .attr("height", function(d) {
+		              return scaleY(d);
+		              })
+		        .attr("fill", function(d, i) {
+		          	  return r2b(i);
+		        	  })
+		        
+		        
+		        
+		        });
+		    
+		    </script>
+	
+	</body>
+	
+</html>
